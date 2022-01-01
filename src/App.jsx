@@ -8,7 +8,7 @@ const App = () => {
   /**
    * Create a varaible here that holds the contract address after you deploy!
    */
-  const contractAddress = "0xd0598c8E11a7CD05fB4Be980D342090A47b66829";
+  const contractAddress = "0xBa2F7b48bADE4Bf079F95a310Aa5E20a1961a27B";
   const contractABI = abi.abi;
   
   const checkIfWalletIsConnected = async () => {
@@ -65,8 +65,8 @@ const App = () => {
 
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
-
-        const waveTxn = await wavePortalContract.wave();
+        //added 12/31/2021
+        const waveTxn = await wavePortalContract.wave("this is a message")
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
@@ -81,7 +81,65 @@ const App = () => {
       console.log(error)
     }
   }
+//added 12/31
+  
+  /*
+   * All state property to store all waves
+   */
+  const [allWaves, setAllWaves] = useState([]);
+ 
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+  
   useEffect(() => {
     checkIfWalletIsConnected();
   }, [])
@@ -95,6 +153,7 @@ const App = () => {
 
         <div className="bio">
           I am farza and I worked on self-driving cars so that's pretty cool right? Connect your Ethereum wallet and wave at me!
+          
         </div>
 
         <button className="waveButton" onClick={wave}>
@@ -106,6 +165,15 @@ const App = () => {
             Connect Wallet
           </button>
         )}
+
+        {allWaves.map((wave, index) => {
+          return (
+            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+              <div>Address: {wave.address}</div>
+              <div>Time: {wave.timestamp.toString()}</div>
+              <div>Message: {wave.message}</div>
+            </div>)
+        })}
       </div>
     </div>
   );
