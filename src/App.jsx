@@ -4,13 +4,28 @@ import './App.css';
 import abi from './utils/WavePortal.json';
 
 const App = () => {
+  
   const [currentAccount, setCurrentAccount] = useState("");
+  const [tweetValue, setTweetValue] = React.useState("");
+  const [allWaves, setAllWaves] = useState([]);
+  
+ // I addded tweet value but its a template 
+  
+  
   /**
-   * Create a varaible here that holds the contract address after you deploy!
-   */
+* Create a varaible here that holds the contract address after you deploy!
+   */   //this is good
   const contractAddress = "0xBa2F7b48bADE4Bf079F95a310Aa5E20a1961a27B";
   const contractABI = abi.abi;
   
+  
+
+    
+
+
+
+
+  //check if wallet connected
   const checkIfWalletIsConnected = async () => {
     try {
       const { ethereum } = window;
@@ -18,17 +33,18 @@ const App = () => {
       if (!ethereum) {
         console.log("Make sure you have metamask!");
         return;
-      } else {
-        console.log("We have the ethereum object", ethereum);
-      }
+      } else console.log("We have the object!,ethereum"); //just added 1/3
 
+    
+      
       const accounts = await ethereum.request({ method: 'eth_accounts' });
 
       if (accounts.length !== 0) {
+ 
         const account = accounts[0];
         console.log("Found an authorized account:", account);
-        setCurrentAccount(account)
-      } else {
+        setCurrentAccount(account)     
+      }  else {
         console.log("No authorized account found")
       }
     } catch (error) {
@@ -66,7 +82,8 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
         //added 12/31/2021
-        const waveTxn = await wavePortalContract.wave("this is a message")
+        
+        const waveTxn = await wavePortalContract.wave();
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
@@ -86,7 +103,6 @@ const App = () => {
   /*
    * All state property to store all waves
    */
-  const [allWaves, setAllWaves] = useState([]);
  
   /*
    * Create a method that gets all waves from your contract
@@ -98,12 +114,13 @@ const App = () => {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+       
 
         /*
          * Call the getAllWaves method from your Smart Contract
          */
         const waves = await wavePortalContract.getAllWaves();
-
+    
 
         /*
          * We only need address, timestamp, and message in our UI so let's
@@ -180,3 +197,7 @@ const App = () => {
 }
 
 export default App
+
+
+
+
