@@ -83,7 +83,7 @@ const App = () => {
         console.log("Retrieved total wave count...", count.toNumber());
         //added 12/31/2021
         
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave("This is a message!");
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
